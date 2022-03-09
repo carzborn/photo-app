@@ -2,6 +2,7 @@
  * Authentication Controller
  */
 const bcrypt = require('bcrypt');
+const debug = require('debug')('books:example_controller');
 const { matchedData, validationResult } = require('express-validator');
 const models = require('../models');
 
@@ -23,18 +24,19 @@ const register = async (req, res) => {
 
 	const validData = matchedData(req);
 
+
 	try{
 		validData.password = await bcrypt.hash(validData.password, models.user.hashSaltRounds);
 	} catch(error){
 		res.status(500).send({ 
-			status: error,
+			status: "error",
 			message: "Exception thrown when hashing password.",
 		});
 		throw error;
 	}
 
 	try{
-		const user = await models.user(validData).save();
+		const user = await new models.user(validData).save();
 
 		res.send({
 			status: 'success',

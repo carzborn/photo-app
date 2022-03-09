@@ -4,7 +4,7 @@
 
  module.exports = (bookshelf) => {
 	return bookshelf.model('user', {
-		tableName: 'users',
+		tableName: 'user',
 		albums(){
 			return this.hasMany('album');
 		},
@@ -19,9 +19,9 @@
 			return await new this({ id }).fetch(fetchOptions);
 		},
 
-		async login(username, password) {
-			// find user based on the username (bail if no such user exists)
-			const user = await new this({ username }).fetch({ require: false });
+		async login(email, password) {
+			// find user based on the email (bail if no such user exists)
+			const user = await new this({ email }).fetch({ require: false });
 			if (!user) {
 				return false;
 			}
@@ -39,5 +39,5 @@
 		}
 	}
 	);
-	
+
 };
