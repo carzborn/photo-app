@@ -1,31 +1,29 @@
 /**
- * Example Validation Rules
+ * User Validation Rules
  */
 
  const { body } = require('express-validator');
  const models = require('../models');
  
  /**
-  * Create Example validation rules
+  * Create user validation rules
   *
-  * Required: title
-  * Optional: -
+  * Required: email, password, first_name, last_name
   */
- const createRules = [
-     body('title').exists().isLength({ min: 4 }),
+ const createUserRules = [
+    body('email').exists().isLength({ min: 5 }).custom(async value => {
+		const email = await new models.user({ email: value }).fetch({ require: false });
+		if (email) {
+			return Promise.reject("Email already registered.");
+		}
+
+		return Promise.resolve();
+	}),
+     body('password').exists().isLength({ min: 10 }),
+     body('first_name').exists().isLength({ min: 2 }),
+     body('last_name').exists().isLength({ min: 2 }),
  ];
- 
- /**
-  * Update Example validation rules
-  *
-  * Required: -
-  * Optional: title
-  */
- const updateRules = [
-     body('title').optional().isLength({ min: 4 }),
- ];
- 
+
  module.exports = {
-     createRules,
-     updateRules,
+     createUserRules,
  }

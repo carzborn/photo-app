@@ -7,40 +7,40 @@ const { matchedData, validationResult } = require('express-validator');
 const models = require('../models');
 
 /**
- * Get all resources
+ * Get all albums
  *
  * GET /
  */
 const index = async (req, res) => {
-	const examples = await models.Example.fetchAll();
+	const albums = await models.album.fetchAll();
 
 	res.send({
 		status: 'success',
-		data: examples,
+		data: albums,
 	});
 }
 
 /**
- * Get a specific resource
+ * Get a specific album
  *
- * GET /:exampleId
+ * GET /:albumId
  */
-const show = async (req, res) => {
-	const example = await new models.Example({ id: req.params.exampleId })
+const showAlbum = async (req, res) => {
+	const album = await new models.album({ id: req.params.exampleId })
 		.fetch();
 
 	res.send({
 		status: 'success',
-		data: example,
+		data: album,
 	});
 }
 
 /**
- * Store a new resource
+ * Store a new album
  *
  * POST /
  */
-const store = async (req, res) => {
+const storeAlbum = async (req, res) => {
 	// check for any validation errors
 	const errors = validationResult(req);
 	if (!errors.isEmpty()) {
@@ -51,18 +51,18 @@ const store = async (req, res) => {
 	const validData = matchedData(req);
 
 	try {
-		const example = await new models.Example(validData).save();
-		debug("Created new example successfully: %O", example);
+		const album = await new models.album(validData).save();
+		debug("Created new album successfully: %O", album);
 
 		res.send({
 			status: 'success',
-			data: example,
+			data: album,
 		});
 
 	} catch (error) {
 		res.status(500).send({
 			status: 'error',
-			message: 'Exception thrown in database when creating a new example.',
+			message: 'Exception thrown in database when creating a new album.',
 		});
 		throw error;
 	}
@@ -128,8 +128,8 @@ const destroy = (req, res) => {
 
 module.exports = {
 	index,
-	show,
-	store,
+	showAlbum,
+	storeAlbum,
 	update,
 	destroy,
 }
