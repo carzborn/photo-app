@@ -7,6 +7,9 @@
 		tableName: 'photos',
 		albums(){
 			return this.belongsToMany('album');
+		},
+		users(){
+			return this.belongsTo('user');
 		}
 	});
 };

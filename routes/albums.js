@@ -15,7 +15,4 @@ router.post('/', exampleValidationRules.createRules, exampleController.store);
 /* Update a specific resource */
 router.put('/:exampleId', exampleValidationRules.updateRules, exampleController.update);
 
-/* Destroy a specific resource */
-router.delete('/:exampleId', exampleController.destroy);
-
 module.exports = router;

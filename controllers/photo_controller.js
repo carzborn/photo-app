@@ -7,11 +7,11 @@ const { matchedData, validationResult } = require('express-validator');
 const models = require('../models');
 
 /**
- * Get all resources
+ * Get all photos
  *
  * GET /
  */
-const index = async (req, res) => {
+const getPhotos = async (req, res) => {
 	const allPhotos = await models.photo.fetchAll();
 
 	res.send({
@@ -26,7 +26,7 @@ const index = async (req, res) => {
  *
  * GET /:photoId
  */
-const show = async (req, res) => {
+const showPhoto = async (req, res) => {
 	const photo = await new models.photo({ id: req.params.photoId })
 		.fetch();
 
@@ -41,7 +41,7 @@ const show = async (req, res) => {
  *
  * POST /
  */
-const store = async (req, res) => {
+const storePhoto = async (req, res) => {
 	// check for any validation errors
 	const errors = validationResult(req);
 	if (!errors.isEmpty()) {
@@ -52,38 +52,38 @@ const store = async (req, res) => {
 	const validData = matchedData(req);
 
 	try {
-		const example = await new models.Example(validData).save();
-		debug("Created new example successfully: %O", example);
+		const photo = await new models.photo(validData).save();
+		debug("Created new photo successfully: %O", photo);
 
 		res.send({
 			status: 'success',
-			data: example,
+			data: photo,
 		});
 
 	} catch (error) {
 		res.status(500).send({
 			status: 'error',
-			message: 'Exception thrown in database when creating a new example.',
+			message: 'Exception thrown in database when creating a photo.',
 		});
 		throw error;
 	}
 }
 
 /**
- * Update a specific resource
+ * Update a specific photo
  *
- * PUT /:exampleId
+ * PUT /:photoId
  */
-const update = async (req, res) => {
-	const exampleId = req.params.exampleId;
+const updatePhoto = async (req, res) => {
+	const photoId = req.params.photoId;
 
-	// make sure example exists
-	const example = await new models.Example({ id: exampleId }).fetch({ require: false });
-	if (!example) {
-		debug("Example to update was not found. %o", { id: exampleId });
+	// make sure photo exists
+	const photo = await new models.photo({ id: photoId }).fetch({ require: false });
+	if (!photo) {
+		debug("Photo to update was not found. %o", { id: photoId });
 		res.status(404).send({
 			status: 'fail',
-			data: 'Example Not Found',
+			data: 'Photo Not Found',
 		});
 		return;
 	}
@@ -98,39 +98,26 @@ const update = async (req, res) => {
 	const validData = matchedData(req);
 
 	try {
-		const updatedExample = await example.save(validData);
-		debug("Updated example successfully: %O", updatedExample);
+		const updatedPhoto = await photo.save(validData);
+		debug("Updated photo successfully: %O", updatedPhoto);
 
 		res.send({
 			status: 'success',
-			data: example,
+			data: photo,
 		});
 
 	} catch (error) {
 		res.status(500).send({
 			status: 'error',
-			message: 'Exception thrown in database when updating a new example.',
+			message: 'Exception thrown in database when updating a new photo.',
 		});
 		throw error;
 	}
 }
 
-/**
- * Destroy a specific resource
- *
- * DELETE /:exampleId
- */
-const destroy = (req, res) => {
-	res.status(400).send({
-		status: 'fail',
-		message: 'You need to write the code for deleting this resource yourself.',
-	});
-}
-
 module.exports = {
-	index,
-	show,
-	store,
-	update,
-	destroy,
+	getPhotos,
+	showPhoto,
+	storePhoto,
+	updatePhoto,
 }

@@ -4,27 +4,30 @@
 
  const { body } = require('express-validator');
  const models = require('../models');
- 
+
  /**
-  * Create Example validation rules
+  * Create phot validation rules
   *
-  * Required: title
-  * Optional: -
+  * Required: title, url & user_id
   */
  const createRules = [
-     body('title').exists().isLength({ min: 4 }),
+     body('title').exists().isLength({ min: 5 }),
+     body('url').exists().isLength({ min:5}),
+     body('user_id').exists().isInt({min:1})
  ];
- 
+
  /**
-  * Update Example validation rules
+  * Update photo validation rules
   *
-  * Required: -
-  * Optional: title
+  * Optional: title, url, comment & user_id
   */
  const updateRules = [
-     body('title').optional().isLength({ min: 4 }),
+     body('title').optional().isLength({ min: 5 }),
+     body('url').optional().isLength({ min:5}),
+     body('comment').optional().isLength({min:5}),
+     body('user_id').optional()
  ];
- 
+
  module.exports = {
      createRules,
      updateRules,
