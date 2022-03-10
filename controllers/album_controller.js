@@ -1,7 +1,7 @@
 /**
- * Example Controller
+ * Album Controller
  */
-
+const debug = require('debug')('album:album_controller')
 const { matchedData, validationResult } = require('express-validator');
 const models = require('../models');
 
@@ -43,12 +43,14 @@ const showUsersAlbums = async (req, res) => {
 const storeAlbum = async (req, res) => {
 	// check for any validation errors
 	const errors = validationResult(req);
+
 	if (!errors.isEmpty()) {
 		return res.status(422).send({ status: 'fail', data: errors.array() });
 	}
 
 	// get only the validated data from the request
 	const validData = matchedData(req);
+	validData.user_id = req.user.id;
 
 	try {
 		const album = await new models.album(validData).save();
@@ -66,7 +68,7 @@ const storeAlbum = async (req, res) => {
 		});
 		throw error;
 	}
-}
+};
 
 /**
  * Update a specific resource
