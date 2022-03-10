@@ -49,7 +49,7 @@ const storeAlbum = async (req, res) => {
 		return res.status(422).send({ status: 'fail', data: errors.array() });
 	}
 
-	// get only the validated data from the request
+
 	const validData = matchedData(req);
 	validData.user_id = req.user.id;
 
@@ -79,7 +79,7 @@ const storeAlbum = async (req, res) => {
 const updateAlbum = async (req, res) => {
 	const albumId = req.params.albumId;
 
-	// make sure example exists
+
 	const album = await new models.album({ id: albumId }).fetch({ require: false });
 	if (!album) {
 		debug("Album to update was not found. %o", { id: albumId });
@@ -96,7 +96,7 @@ const updateAlbum = async (req, res) => {
 		return res.status(422).send({ status: 'fail', data: errors.array() });
 	}
 
-	// get only the validated data from the request
+
 	const validData = matchedData(req);
 
 	try {
@@ -150,7 +150,7 @@ const addPhoto = async (req, res) => {
 	if ( album.related('photos').find( photo => photo.id === validData.photo_id ) ) {
 		return res.status(400).send({
 			status: 'fail',
-			data: 'Photo already exists in this album'
+			data: 'Photo already exists in this album.'
 		});
 	}
 
@@ -168,56 +168,6 @@ const addPhoto = async (req, res) => {
 		throw error;
 	}
 }
-
-// const addPhoto = async (req, res) => {
-// 	// check for any validation errors
-
-// 	const errors = validationResult(req);
-// 	if (!errors.isEmpty()) {
-// 		return res.status(400).send({ status: 'fail', data: errors.array() });
-// 	}
-
-// 	// get only the validated data from the request
-// 	const validData = matchedData(req);	
-
-// 	// load all req.user photos
-
-	 
-// 	 try {
-// 		const album = await new models.album({ id: req.params.albumId }).fetch();
-
-// 		if(req.user.id == album.attributes.user_id) {
-// 			const photoExists = await new models.photo({id: validData.photo_id}).fetch();
-		
-			
-// 			if(photoExists.id == validData.photo_id) {
-// 				await photoExists.save({album_id : album.id})
-// 				res.status(200).send({
-// 					status: 'success',
-// 					data: null
-// 				});
-
-// 			} else {
-// 				res.status(404).send({
-// 					status: 'fail',
-// 					message: 'Photo does not exists and cannot be added to your album'
-// 				})
-// 			}  
-
-// 		} else {
-// 			res.status(404).send({
-// 					status: 'fail',
-// 					message: 'Album does not exist'
-// 				})
-// 		}
-
-// 	} catch (error) {
-// 		res.status(400).send({
-// 			 status: 'error',
-// 			 message: 'Failed adding photo to album',
-// 		})
-// 	}
-// }
 
 module.exports = {
 	showUsersAlbums,

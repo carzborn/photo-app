@@ -32,38 +32,51 @@ const getPhotos = async (req, res) => {
 }
 
 /**
- * Get a specific resource
+ * Get a specific photo
  *
- * GET /:photoId
+ * GET /:photos/photoId
  */
 const showPhoto = async (req, res) => {
-	const photo = await new models.photo({ id: req.params.photoId })
-		.fetch();
+	const photo = await new models.photo({id: req.params.photoId}).fetch({require: false});
 
-	res.send({
+	if(!photo){
+		return res.status(404).send({
+			status: 'fail',
+			data: "Photo could'nt be found"
+		});
+	}
+	// Check if the user is authorized to view this photo
+	if (photo.attributes.user_id !== req.user.id) {
+        return res.status(403).send({
+            status: 'fail',
+            data:"'This doesn't belong to you..!"
+        });
+    }
+
+	res.status(200).send({
 		status: 'success',
 		data: photo,
 	});
 }
 
 /**
- * Store a new resource
+ * Store a new photo
  *
- * POST /
+ * POST /photos
  */
  const storePhoto = async (req, res) => {
-    // checks validation rules
+
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         return res.status(422).send({ status: 'fail', data: errors.array() });
     }
 
-    // get the the data for easier access
+
     const validData = matchedData(req);
 
 	validData.user_id = req.user.id;
 
-    // check that it saves correctly to the database
+
     try {
         const photo = await new models.photo(validData).save();
 
@@ -87,44 +100,49 @@ const showPhoto = async (req, res) => {
  * PUT /:photoId
  */
 const updatePhoto = async (req, res) => {
-	const photoId = req.params.photoId;
 
-	// make sure photo exists
-	const photo = await new models.photo({ id: photoId }).fetch({ require: false });
+	let photo = await new models.photo({id: req.params.photoId}).fetch({require: false});
+
+	//  If the photo doesn't exist, return information to the user
 	if (!photo) {
-		debug("Photo to update was not found. %o", { id: photoId });
-		res.status(404).send({
-			status: 'fail',
-			data: 'Photo Not Found',
-		});
-		return;
-	}
+        return res.status(404).send({
+            status: 'fail',
+            data: 'There is no such photo'
+        });
+    }
 
-	// check for any validation errors
+	// If the photo doesn't belong to the user, tell em
+	if (photo.attributes.user_id !== req.user.id) {
+        return res.status(403).send({
+            status: 'fail',
+            data: 'That is not your photo!'
+        });
+    }
+
 	const errors = validationResult(req);
-	if (!errors.isEmpty()) {
-		return res.status(422).send({ status: 'fail', data: errors.array() });
-	}
+    if (!errors.isEmpty()) {
+        return res.status(400).send({
+            status: 'fail',
+            data: errors.array()
+        });
+    }
 
-	// get only the validated data from the request
+	//  Get the data after its validation
 	const validData = matchedData(req);
 
-	try {
-		const updatedPhoto = await photo.save(validData);
-		debug("Updated photo successfully: %O", updatedPhoto);
+	try{
+		photo = await photo.save(validData);
 
-		res.send({
+		res.status(200).send({
 			status: 'success',
 			data: photo,
 		});
-
-	} catch (error) {
+	} catch(error){
 		res.status(500).send({
 			status: 'error',
-			message: 'Exception thrown in database when updating a new photo.',
+			message: 'Exception thrown in database when',
 		});
-		throw error;
-	}
+	} throw errors;
 }
 
 module.exports = {

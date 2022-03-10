@@ -1,12 +1,12 @@
 /**
- * Example Validation Rules
+ * Photo Validation Rules
  */
 
  const { body } = require('express-validator');
  const models = require('../models');
 
  /**
-  * Create phot validation rules
+  * Create photo validation rules
   *
   * Required: title, url & user_id
   */
@@ -25,7 +25,6 @@
      body('title').optional().isLength({ min: 3 }),
      body('url').optional().isLength({ min:5}).isURL(),
      body('comment').optional().isLength({min:3}),
-     body('user_id').optional()
  ];
 
  module.exports = {

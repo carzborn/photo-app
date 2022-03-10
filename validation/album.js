@@ -16,25 +16,20 @@
 
  /**
   * Update album validation rules
-  *
-  * Required: -
   */
  const updateRules = [
      body('title').optional().isLength({ min: 4 }),
  ];
 
+ /* Add photo to album validation rules */
  const addPhotoToAlbum = [
     body('photo_id').exists().isInt().custom(
-        // Make sure that there is a photo with given id
         async value => {
             const photo = await new models.photo({ id: value }).fetch({ require: false});
 
             if (!photo) {
-                // Reject if no photo was found
                 return Promise.reject('There is no photo with that id');
             }
-
-            // Otherwise resolve
             return Promise.resolve();
         }
     )

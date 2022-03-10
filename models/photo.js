@@ -1,3 +1,7 @@
+/**
+ * photo model
+*/
+
 module.exports = (bookshelf) => {
     return bookshelf.model('photo', {
         tableName: 'photos',
@@ -8,7 +12,8 @@ module.exports = (bookshelf) => {
         albums() {
             return this.belongsToMany('album');
         },
-    }, {
+    },
+	 {
         async fetchById(id, fetchOptions = {}) {
             return await new this({ id }).fetch(fetchOptions);
         }

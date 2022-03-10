@@ -15,6 +15,7 @@ router.post('/', albumValidationRules.createRules, albumController.storeAlbum);
 /* Update a specific album */
 router.put('/:albumId', albumValidationRules.updateRules, albumController.updateAlbum);
 
+/* Add photo to an album */
 router.post('/:albumId/photos', albumValidationRules.addPhotoToAlbum, albumController.addPhoto)
 
 module.exports = router;
