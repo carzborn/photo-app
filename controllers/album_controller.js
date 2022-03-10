@@ -129,48 +129,32 @@ const addPhoto = async (req, res) => {
 	}
 	const validData = matchedData(req);
 
-	// Get relation between user and album
-	const user = await models.user.fetchById(req.user.user_id, {withRelated: ['albums'],});
-
-	// Get relation between album and photo
-	const album = await models.album.fetchById(req.params.albumId, { withRelated: ['photos'] });
-
-	// Get the requested album
-	const userAlbum = user.related('albums').find(album => album.id == req.params.albumId);
-
-	// Get the photos the user owns
-	const userPhoto = user.related('photos').find(photo => photo.id == validData.photo_id);
-
-	// Check if the photo being added already exists
-	const existingPhoto = album.related('photos').find(photo => photo.id == validData.photo_id);
-
-		// If the photo exists, fail
-		if(existingPhoto){
-			return res.send({
-				status: "fail",
-				data: "The photo already exists"
-			});
-		}
-
-	// Check if the album belongs to the user
-	if(!userAlbum){
-		res.status(403).send({
-			status: "fail",
-			data: "This is not your album.."
-		});
-		return;
-	}
-
-	if(!userPhoto){
-		 res.status(403).send({
-			status: "fail",
-			data: "Photo could not be found"
-		});
-		return;
-	}
+	const photo = await new models.photo({ id: validData.photo_id }).fetch({ require: false });
 
 	try{
-		await album.photos().attach(validData.photo_id);
+		const album = await models.album.fetchById(req.params.albumId, { withRelated: ['photos'], require: false });
+
+		if(!album){
+			return res.status(403).send({
+			   status: "fail",
+			   data: "This is not your album.."
+		   });
+	   }
+
+	   if (photo.attributes.user_id !== album.attributes.user_id) {
+		return res.status(403).send({
+			status: 'fail',
+			data: "That's not your photo.."
+		});
+	}
+	if ( album.related('photos').find( photo => photo.id === validData.photo_id ) ) {
+		return res.status(400).send({
+			status: 'fail',
+			data: 'Photo already exists in this album'
+		});
+	}
+
+		 await album.photos().attach(validData.photo_id);
 
 		res.send({
 			status: 'success',
