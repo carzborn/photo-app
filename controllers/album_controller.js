@@ -2,38 +2,38 @@
  * Example Controller
  */
 
-const debug = require('debug')('books:example_controller');
 const { matchedData, validationResult } = require('express-validator');
 const models = require('../models');
 
-/**
- * Get all albums
- *
- * GET /
- */
-const index = async (req, res) => {
-	const albums = await models.album.fetchAll();
+	//	Get users albums
+const showUsersAlbums = async (req, res) => {
+    await req.user.load('albums');
 
-	res.send({
-		status: 'success',
-		data: albums,
-	});
-}
+    try {
+    res.status(200).send({
+        status: 'success',
+        data: req.user.related('albums')
+    })
+    } catch (error) {
+        res.status(500).send({
+            status: 'fail',
+            message: "Exception thrown in database when getting a new album."
+        });
+        throw error;
+    }
+};
 
-/**
- * Get a specific album
- *
- * GET /:albumId
- */
-const showAlbum = async (req, res) => {
-	const album = await new models.album({ id: req.params.exampleId })
-		.fetch();
+	// Get a users specfic albums
+	const showUsersAlbum = async (req, res) => {
+		const album = await new models.album({id: req.params.albumsId})
+		.fetch({withRelated:['photos']});
 
-	res.send({
-		status: 'success',
-		data: album,
-	});
-}
+
+		res.status(200).send({
+			status: 'success',
+			data: album,
+		});
+	};
 
 /**
  * Store a new album
@@ -127,8 +127,8 @@ const destroy = (req, res) => {
 }
 
 module.exports = {
-	index,
-	showAlbum,
+	showUsersAlbums,
+	showUsersAlbum,
 	storeAlbum,
 	update,
 	destroy,

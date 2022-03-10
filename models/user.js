@@ -2,6 +2,8 @@
  * User model
  */
 
+ const bcrypt = require('bcrypt')
+
  module.exports = (bookshelf) => {
 	return bookshelf.model('user', {
 		tableName: 'user',

@@ -28,7 +28,7 @@ const register = async (req, res) => {
 	try{
 		validData.password = await bcrypt.hash(validData.password, models.user.hashSaltRounds);
 	} catch(error){
-		res.status(500).send({ 
+		res.status(500).send({
 			status: "error",
 			message: "Exception thrown when hashing password.",
 		});
@@ -56,6 +56,26 @@ const register = async (req, res) => {
 	}
 }
 
+const login = async (req, res) => {
+	// logging in the user, if user doesnt exists, send error 401
+	const user = await models.User.login(req.body.email, req.body.password);
+	if (!user) {
+		return res.status(401).send({
+			status: "fail",
+			data: "Authentication failed.",
+		});
+	}
+
+	// response
+	return res.send({
+		status: "success",
+		data: {
+			user,
+		},
+	});
+};
+
 module.exports = {
 	register,
+	login,
 }

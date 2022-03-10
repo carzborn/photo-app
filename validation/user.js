@@ -6,12 +6,12 @@
  const models = require('../models');
  
  /**
-  * Create user validation rules
+  * Register new user validation rules
   *
   * Required: email, password, first_name, last_name
   */
  const createUserRules = [
-    body('email').exists().isLength({ min: 5 }).custom(async value => {
+    body('email').exists().isLength({ min: 5 }).isEmail().custom(async value => {
 		const email = await new models.user({ email: value }).fetch({ require: false });
 		if (email) {
 			return Promise.reject("Email already registered.");
