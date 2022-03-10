@@ -12,13 +12,23 @@ const models = require('../models');
  * GET /
  */
 const getPhotos = async (req, res) => {
-	const allPhotos = await models.photo.fetchAll();
 
-	res.send({
-		status: 'success',
-		data: { allPhotos
-		}
-	});
+	// Tries to fetch all the related photos and display them
+    try {
+        const photos = await new models.photo().where({ 'user_id': req.user.id }).fetchAll({ columns: ['id', 'title', 'url', 'comment'] });
+
+
+        res.send({
+            status: 'success',
+            data: photos,
+        });
+    } catch (error) {
+        res.status(404).send({
+            status: 'error',
+            data: 'Photo(s) Not Found',
+        });
+        return;
+    }
 }
 
 /**
@@ -41,32 +51,34 @@ const showPhoto = async (req, res) => {
  *
  * POST /
  */
-const storePhoto = async (req, res) => {
-	// check for any validation errors
-	const errors = validationResult(req);
-	if (!errors.isEmpty()) {
-		return res.status(422).send({ status: 'fail', data: errors.array() });
-	}
+ const storePhoto = async (req, res) => {
+    // checks validation rules
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(422).send({ status: 'fail', data: errors.array() });
+    }
 
-	// get only the validated data from the request
-	const validData = matchedData(req);
+    // get the the data for easier access
+    const validData = matchedData(req);
 
-	try {
-		const photo = await new models.photo(validData).save();
-		debug("Created new photo successfully: %O", photo);
+	validData.user_id = req.user.id;
 
-		res.send({
-			status: 'success',
-			data: photo,
-		});
+    // check that it saves correctly to the database
+    try {
+        const photo = await new models.photo(validData).save();
 
-	} catch (error) {
-		res.status(500).send({
-			status: 'error',
-			message: 'Exception thrown in database when creating a photo.',
-		});
-		throw error;
-	}
+        res.send({
+            status: 'success',
+            data: photo,
+        });
+
+    } catch (error) {
+        res.status(500).send({
+            status: 'error',
+            message: 'Exception thrown in database when creating a new photo.',
+        });
+        throw error;
+    }
 }
 
 /**

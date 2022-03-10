@@ -26,7 +26,7 @@ const register = async (req, res) => {
 
 
 	try{
-		validData.password = await bcrypt.hash(validData.password, models.user.hashSaltRounds);
+		validData.password = await bcrypt.hash(validData.password, 10);
 	} catch(error){
 		res.status(500).send({
 			status: "error",
@@ -58,7 +58,7 @@ const register = async (req, res) => {
 
 const login = async (req, res) => {
 	// logging in the user, if user doesnt exists, send error 401
-	const user = await models.User.login(req.body.email, req.body.password);
+	const user = await models.user.login(req.body.email, req.body.password);
 	if (!user) {
 		return res.status(401).send({
 			status: "fail",

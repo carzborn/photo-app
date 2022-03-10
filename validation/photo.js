@@ -10,12 +10,11 @@
   *
   * Required: title, url & user_id
   */
- const createRules = [
-     body('title').exists().isLength({ min: 5 }),
-     body('url').exists().isLength({ min:5}),
-     body('user_id').exists().isInt({min:1}),
-     body('comment').optional()
- ];
+  const createRules = [
+	body("url").exists().isURL(),
+	body("comment").optional().isLength({ min: 3 }),
+	body("title").exists().isLength({ min: 3 }),
+];
 
  /**
   * Update photo validation rules
@@ -23,9 +22,9 @@
   * Optional: title, url, comment & user_id
   */
  const updateRules = [
-     body('title').optional().isLength({ min: 5 }),
-     body('url').optional().isLength({ min:5}),
-     body('comment').optional().isLength({min:5}),
+     body('title').optional().isLength({ min: 3 }),
+     body('url').optional().isLength({ min:5}).isURL(),
+     body('comment').optional().isLength({min:3}),
      body('user_id').optional()
  ];
 

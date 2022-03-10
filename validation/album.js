@@ -23,7 +23,10 @@
      body('title').optional().isLength({ min: 4 }),
  ];
 
+ const addPhotoToAlbum = [body("photo_id").exists()];
+
  module.exports = {
      createRules,
      updateRules,
+     addPhotoToAlbum,
  }
